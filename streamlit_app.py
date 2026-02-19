@@ -3,8 +3,20 @@ from PIL import Image
 import io
 import zipfile
 from datetime import datetime
+import re
 
 st.set_page_config(page_title="Batch Bildgrößen ändern", page_icon="🖼️", layout="wide")
+
+def sanitize_filename(filename):
+    """Entfernt problematische Zeichen aus Dateinamen"""
+    # Ersetze problematische Zeichen
+    filename = re.sub(r'[<>:"/\|?*]', '_', filename)
+    # Entferne führende/trailing Leerzeichen
+    filename = filename.strip()
+    # Stelle sicher, dass der Name nicht leer ist
+    if not filename:
+        filename = "image"
+    return filename
 
 st.title("🖼️ Batch Bildgrößen ändern")
 st.markdown("Laden Sie mehrere Bilder hoch und ändern Sie deren Größe auf einmal!")
@@ -93,8 +105,9 @@ if uploaded_files:
                     else:
                         save_format = output_format
                     
-                    # Dateinamen anpassen
+                    # Dateinamen anpassen und bereinigen
                     original_name = uploaded_file.name.rsplit('.', 1)[0]
+                    original_name = sanitize_filename(original_name)
                     extension = save_format.lower()
                     if extension == "jpeg":
                         extension = "jpg"
