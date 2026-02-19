@@ -7,17 +7,6 @@ import re
 
 st.set_page_config(page_title="Batch Bildgrößen ändern", page_icon="🖼️", layout="wide")
 
-def sanitize_filename(filename):
-    """Entfernt problematische Zeichen aus Dateinamen"""
-    # Ersetze problematische Zeichen
-    filename = re.sub(r'[<>:"/\|?*]', '_', filename)
-    # Entferne führende/trailing Leerzeichen
-    filename = filename.strip()
-    # Stelle sicher, dass der Name nicht leer ist
-    if not filename:
-        filename = "image"
-    return filename
-
 st.title("🖼️ Batch Bildgrößen ändern")
 st.markdown("Laden Sie mehrere Bilder hoch und ändern Sie deren Größe auf einmal!")
 
@@ -105,9 +94,13 @@ if uploaded_files:
                     else:
                         save_format = output_format
                     
-                    # Dateinamen anpassen und bereinigen
+                    # Dateinamen bereinigen - INLINE ohne separate Funktion
                     original_name = uploaded_file.name.rsplit('.', 1)[0]
-                    original_name = sanitize_filename(original_name)
+                    # Entferne problematische Zeichen direkt hier
+                    original_name = re.sub(r'[<>:"/\\|?*]', '_', original_name).strip()
+                    if not original_name:
+                        original_name = f"image_{idx+1}"
+                    
                     extension = save_format.lower()
                     if extension == "jpeg":
                         extension = "jpg"
