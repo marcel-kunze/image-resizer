@@ -3,7 +3,6 @@ from PIL import Image
 import io
 import zipfile
 from datetime import datetime
-import re
 
 st.set_page_config(page_title="Batch Bildgrößen ändern", page_icon="🖼️", layout="wide")
 
@@ -94,17 +93,11 @@ if uploaded_files:
                     else:
                         save_format = output_format
                     
-                    # Dateinamen bereinigen - INLINE ohne separate Funktion
-                    original_name = uploaded_file.name.rsplit('.', 1)[0]
-                    # Entferne problematische Zeichen direkt hier
-                    original_name = re.sub(r'[<>:"/\\|?*]', '_', original_name).strip()
-                    if not original_name:
-                        original_name = f"image_{idx+1}"
-                    
+                    # EINFACHER Dateiname - einfach nummeriert
                     extension = save_format.lower()
                     if extension == "jpeg":
                         extension = "jpg"
-                    new_filename = f"{original_name}_resized.{extension}"
+                    new_filename = f"image_{idx+1:03d}_resized.{extension}"
                     
                     # In Speicher speichern
                     img_buffer = io.BytesIO()
@@ -127,10 +120,10 @@ if uploaded_files:
                     # Progress aktualisieren
                     progress = (idx + 1) / len(uploaded_files)
                     progress_bar.progress(progress)
-                    status_text.text(f"Verarbeite: {uploaded_file.name} ({idx + 1}/{len(uploaded_files)})")
+                    status_text.text(f"Verarbeite Bild {idx + 1} von {len(uploaded_files)}")
                     
                 except Exception as e:
-                    st.error(f"❌ Fehler bei {uploaded_file.name}: {str(e)}")
+                    st.error(f"❌ Fehler bei Bild {idx+1}: {str(e)}")
         
         progress_bar.progress(1.0)
         status_text.text("✅ Fertig!")
